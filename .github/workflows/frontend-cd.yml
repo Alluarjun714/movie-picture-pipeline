@@ -113,6 +113,7 @@ jobs:
         run: |
           kubectl config set-cluster cluster --server=https://DB4ACC87D659446FFD13E806AE7DAD0E.gr7.us-east-1.eks.amazonaws.com --insecure-skip-tls-verify=true
           TOKEN=$(aws eks get-token --cluster-name cluster --region us-east-1 --query 'status.token' --output text)
+          echo "Token length: ${#TOKEN}"
           kubectl config set-credentials github-action-user --token="$TOKEN"
           kubectl config set-context github-action --cluster=cluster --user=github-action-user
           kubectl config use-context github-action
