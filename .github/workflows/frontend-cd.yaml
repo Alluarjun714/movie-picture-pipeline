@@ -1,4 +1,4 @@
-name: Frontend CD
+name: Frontend Continuous Deployment
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - "starter/frontend/**"
-      - ".github/workflows/frontend-cd.yml"
+      - ".github/workflows/frontend-cd.yaml"
   workflow_dispatch:
 
 env:
@@ -21,7 +21,6 @@ jobs:
     defaults:
       run:
         working-directory: starter/frontend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,7 +43,6 @@ jobs:
     defaults:
       run:
         working-directory: starter/frontend
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -64,10 +62,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs:
-      - lint
-      - test
-
+    needs: [lint, test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -88,6 +83,7 @@ jobs:
         working-directory: starter/frontend
         run: |
           docker build \
+            --build-arg REACT_APP_MOVIE_API_URL=http://adc443dfb195746a69128bd7c2142491-1230811994.us-east-1.elb.amazonaws.com \
             --tag=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
             .
 
@@ -99,7 +95,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
