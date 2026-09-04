@@ -9,13 +9,15 @@ function MovieList({ onMovieClick }) {
     axios
       .get('http://adc443dfb195746a69128bd7c2142491-1230811994.us-east-1.elb.amazonaws.com/movies')
       .then((response) => {
-        setMovies(response.data.movies);
+        if (response.data && Array.isArray(response.data.movies)) {
+          setMovies(response.data.movies);
+        }
       });
   }, []);
 
   return (
     <ul>
-      {movies.map((movie) => (
+      {(movies || []).map((movie) => (
         <li className="movieItem" key={movie.id} onClick={() => onMovieClick(movie)}>
           {movie.title}
         </li>
