@@ -152,7 +152,6 @@ resource "aws_eks_cluster" "main" {
   depends_on = [aws_iam_role_policy_attachment.eks_cluster, aws_iam_role_policy_attachment.eks_service]
 }
 
-
 # Create an IAM role for the EKS cluster
 resource "aws_iam_role" "eks_cluster" {
   name = "eks_cluster_role"
@@ -182,13 +181,12 @@ resource "aws_iam_role_policy_attachment" "eks_service" {
   role       = aws_iam_role.eks_cluster.name
 }
 
-
 ##################
 # EKS Node Group
 ##################
 # Track latest release for the given k8s version
 data "aws_ssm_parameter" "eks_ami_release_version" {
-  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.main.version}/amazon-linux-2/recommended/release_version"
+  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.main.version}/amazon-linux-2023/x86_64/standard/recommended/release_version"
 }
 
 resource "aws_eks_node_group" "main" {
@@ -206,9 +204,6 @@ resource "aws_eks_node_group" "main" {
     min_size     = 1
   }
 
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
     aws_iam_role_policy_attachment.node_group_policy,
     aws_iam_role_policy_attachment.cni_policy,
@@ -255,7 +250,6 @@ data "aws_iam_policy_document" "assume_role_policy" {
 ######################
 # CodeBuild Resources
 ######################
-# Create a CodeBuild project
 resource "aws_codebuild_project" "codebuild" {
   name          = "udacity"
   description   = "Udacity CodeBuild project"
@@ -285,7 +279,6 @@ resource "aws_codebuild_project" "codebuild" {
   }
 }
 
-# Create the Codebuild Role
 resource "aws_iam_role" "codebuild" {
   name = "codebuild-role"
 
@@ -303,28 +296,27 @@ resource "aws_iam_role" "codebuild" {
   })
 }
 
-# Attach the IAM policy to the codebuild role
 resource "aws_iam_role_policy_attachment" "codebuild" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildAdminAccess"
   role       = aws_iam_role.codebuild.name
 }
 
 ####################
-# Github Action role
+# Github Action role (Commented out to bypass Vocareum IAM restrictions)
 ####################
-resource "aws_iam_user" "github_action_user" {
-  name = "github-action-user"
-}
+# resource "aws_iam_user" "github_action_user" {
+#   name = "github-action-user"
+# }
 
-resource "aws_iam_user_policy" "github_action_user_permission" {
-  user   = aws_iam_user.github_action_user.name
-  policy = data.aws_iam_policy_document.github_policy.json
-}
+# resource "aws_iam_user_policy" "github_action_user_permission" {
+#   user   = aws_iam_user.github_action_user.name
+#   policy = data.aws_iam_policy_document.github_policy.json
+# }
 
-data "aws_iam_policy_document" "github_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["ecr:*", "eks:*", "ec2:*", "iam:GetUser"]
-    resources = ["*"]
-  }
-}
+# data "aws_iam_policy_document" "github_policy" {
+#   statement {
+#     effect    = "Allow"
+#     actions   = ["ecr:*", "eks:*", "ec2:*", "iam:GetUser"]
+#     resources = ["*"]
+#   }
+# }

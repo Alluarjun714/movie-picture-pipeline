@@ -1,7 +1,7 @@
 variable "k8s_version" {
-  default = "1.25"
+  type    = string
+  default = "1.31"
 }
-
 variable "enable_private" {
   default = false
 }

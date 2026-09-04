@@ -469,3 +469,7 @@ kustomize build | kubectl apply -f -
 ## License
 
 [License](LICENSE.md)
+
+## Live Application Endpoints
+- **Frontend App:** http://a685a05661c8e4d9c8291221d6abe4e2-1067299207.us-east-1.elb.amazonaws.com
+- **Backend API:** http://adc443dfb195746a69128bd7c2142491-1230811994.us-east-1.elb.amazonaws.com
